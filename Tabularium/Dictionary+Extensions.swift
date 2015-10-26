@@ -10,7 +10,8 @@ func +<Key, Value>(var lhs: [Key: Value], rhs: [Key: Value]) -> [Key: Value] {
 }
 
 extension Dictionary {
-    func map<T>(f: Value -> T) -> [Key : T] {
-        return self.reduce([:]) { $0 + [$1.0: f($1.1)] }
+    
+    func map<T>(f: Value throws -> T) rethrows -> [Key : T] {
+        return try self.reduce([:]) { $0 + [$1.0: try f($1.1)] }
     }
 }

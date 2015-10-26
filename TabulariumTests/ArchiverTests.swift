@@ -13,11 +13,11 @@ struct LoginInfo: Archivable {
         
         if case .Object(let object) = archive {
             
-            guard let passwordArchive = object["password"], case let .String(password) = passwordArchive else {
+            guard let password = object["password"] else {
                 throw ArchiverError.KeyNotFound("password")
             }
         
-            return LoginInfo(password: password)
+            return LoginInfo(password: try String.decompress(password))
         
         } else {
             throw ArchiverError.NoValueFound
@@ -44,15 +44,15 @@ struct User: Archivable {
         
         if case .Object(let object) = archive {
             
-            guard let nameArchive = object["name"], case let .String(name) = nameArchive else {
+            guard let name = object["name"] else {
                 throw ArchiverError.KeyNotFound("name")
             }
             
-            guard let loginInfoArchive = object["login_info"] else {
+            guard let loginInfo = object["login_info"] else {
                 throw ArchiverError.KeyNotFound("login_info")
             }
             
-            return User(name: name, loginInfo: try LoginInfo.decompress(loginInfoArchive))
+            return User(name: try String.decompress(name), loginInfo: try LoginInfo.decompress(loginInfo))
             
         } else {
             throw ArchiverError.NoValueFound
