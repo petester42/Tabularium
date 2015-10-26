@@ -11,7 +11,6 @@ public enum Archive {
 public extension Archive {
     
     static func decode(object: AnyObject) -> Archive {
-        
         switch object {
         case let v as [AnyObject]:
             return .Array(v.map(decode))
@@ -27,7 +26,6 @@ public extension Archive {
     }
     
     static func encode(archive: Archive) -> AnyObject {
-        
         switch archive {
         case .Object(let object):
             return object.map(encode)
@@ -51,6 +49,18 @@ extension Archive: Archivable {
     
     public static func decompress(archive: Archive) throws -> Archive {
         return archive
+    }
+}
+
+extension Archive {
+    
+    public static func fromOptional(optional: Archive?) throws -> Archive {
+        switch optional {
+        case .Some(let value):
+            return value
+        case .None:
+            throw ArchiverError.NoValueFound
+        }
     }
 }
 
