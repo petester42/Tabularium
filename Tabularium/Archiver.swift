@@ -1,74 +1,73 @@
 import Foundation
 
-public enum ArchiverError: ErrorType {
-    case ArchiveFailed
-    case UnarchiveFailed
-    case NoValueFound
-    case KeyNotFound(String)
+public protocol KeyedArchiver {
+    static func archive(rootObject: AnyObject, toFile path: String) -> Bool
 }
 
-public class Archiver<T: Archivable>: NSObject, NSCoding {
+extension NSKeyedArchiver: KeyedArchiver {
+    public static func archive(rootObject: AnyObject, toFile path: String) -> Bool {
+        return self.archiveRootObject(rootObject, toFile: path)
+    }
+}
+
+public protocol KeyedUnarchiver {
+    static func unarchive(objectWithFile path: String) -> AnyObject?
+}
+
+extension NSKeyedUnarchiver: KeyedUnarchiver {
+    public static func unarchive(objectWithFile path: String) -> AnyObject? {
+        return self.unarchiveObjectWithFile(path)
+    }
+}
+
+public func archive<Value: Archivable where Value == Value.ArchivedType>(keyedArchived: KeyedArchiver.Type = NSKeyedArchiver.self, object: Value, toFile path: String) throws  {
     
-    private typealias Value = T.ArchivedType
-    private let value: Value?
+    guard keyedArchived.archive(Encoder<Value>(object), toFile: path) else {
+        throw ArchiverError.ArchiveFailed
+    }
+}
+
+public func unarchive<Value: Archivable where Value == Value.ArchivedType>(keyedUnarchiver: KeyedUnarchiver.Type = NSKeyedUnarchiver.self, objectWithFile path: String) throws -> ArchiveResult<Value> {
+    
+    guard let unarchived = keyedUnarchiver.unarchive(objectWithFile: path) as? Encoder<Value> else {
+        throw ArchiverError.UnarchiveFailed
+    }
+    
+    return unarchived.value
+}
+
+internal class Encoder<Value: Archivable where Value == Value.ArchivedType>: NSObject, NSCoding {
+    
+    private let value: ArchiveResult<Value>
     
     private init(_ _value: Value) {
-        value = _value
+        value = .Success(_value)
         super.init()
     }
     
     // MARK - NSCoding
     
-    required public init?(coder aDecoder: NSCoder) {
+    required init?(coder aDecoder: NSCoder) {
         
         guard let decompressedObject = aDecoder.decodeObject() else {
-            value = nil
+            value = .Failure(.EmptyArchive)
             super.init()
             return
         }
-
-        do {
-            value = try T.decompress(Archive.decode(decompressedObject))
-        } catch {
-            value = nil
-        }
+        
+ 
+        value = Value.decompress(Archive.decode(decompressedObject))
         
         super.init()
     }
     
-    public func encodeWithCoder(aCoder: NSCoder) {
+    func encodeWithCoder(aCoder: NSCoder) {
         
-        guard let value = value else {
+        guard case .Success(let value) = value else {
             // This should never happen
             return
         }
         
-        aCoder.encodeObject(Archive.encode(T.compress(value)))
-    }
-    
-//    // MARK - NSSecureCoding
-//    
-//    public static func supportsSecureCoding() -> Bool {
-//        return true
-//    }
-    
-    static public func archive(object: Value, toFile path: String) throws  {
-        
-        guard NSKeyedArchiver.archiveRootObject(Archiver(object), toFile: path) else {
-            throw ArchiverError.ArchiveFailed
-        }
-    }
-    
-    static public func unarchive(objectWithFile path: String) throws -> Value {
-        
-        guard let unarchived = NSKeyedUnarchiver.unarchiveObjectWithFile(path) as? Archiver else {
-            throw ArchiverError.UnarchiveFailed
-        }
-        
-        guard let value = unarchived.value else {
-            throw ArchiverError.NoValueFound
-        }
-        
-        return value
+        aCoder.encodeObject(Archive.encode(Value.compress(value)))
     }
 }

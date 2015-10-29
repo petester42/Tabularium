@@ -12,14 +12,14 @@ public extension Archive {
     
     static func decode(object: AnyObject) -> Archive {
         switch object {
-        case let v as [AnyObject]:
-            return .Array(v.map(decode))
-        case let v as [Swift.String: AnyObject]:
-            return .Object(v.map(decode))
-        case let v as Swift.String:
-            return .String(v)
-        case let v as NSNumber:
-            return .Number(v)
+        case let array as [AnyObject]:
+            return .Array(array.map(decode))
+        case let dictionary as [Swift.String : AnyObject]:
+            return .Object(dictionary.map(decode))
+        case let string as Swift.String:
+            return .String(string)
+        case let number as NSNumber:
+            return .Number(number)
         default:
             return .Null
         }
@@ -47,32 +47,37 @@ extension Archive: Archivable {
         return value
     }
     
-    public static func decompress(archive: Archive) throws -> Archive {
-        return archive
+    public static func decompress(archive: Archive) -> ArchiveResult<Archive> {
+        return .Success(archive)
     }
 }
 
-extension Archive {
-    
-    public static func fromOptional(optional: Archive?) throws -> Archive {
-        switch optional {
-        case .Some(let value):
-            return value
-        case .None:
-            throw ArchiverError.NoValueFound
-        }
-    }
-}
+//public extension CollectionType where Generator.Element == Archive {
+//
+//    public static func fromOptional(optional: [Archive]?) throws -> [Archive] {
+//        switch optional {
+//        case .Some(let value):
+//            return value
+//        case .None:
+//            throw ArchiveError.EmptyArchive
+//        }
+//    }
+//}
 
 extension Archive: CustomStringConvertible {
    
     public var description: Swift.String {
         switch self {
-        case let .String(v): return "String(\(v))"
-        case let .Number(v): return "Number(\(v))"
-        case let .Array(a): return "Array(\(a.description))"
-        case let .Object(o): return "Object(\(o.description))"
-        case .Null: return "Null"
+        case .Object(let object):
+            return "Object(\(object.description))"
+        case .Array(let array):
+            return "Array(\(array.description))"
+        case .String(let string):
+            return "String(\(string))"
+        case .Number(let number):
+            return "Number(\(number))"
+        case .Null:
+            return "Null"
         }
     }
 }
@@ -81,15 +86,16 @@ extension Archive: Equatable { }
 
 public func == (lhs: Archive, rhs: Archive) -> Bool {
     switch (lhs, rhs) {
+    case let (.Object(l), .Object(r)):
+        return l == r
+    case let (.Array(l), .Array(r)):
+        return l == r
     case let (.String(l), .String(r)):
         return l == r
     case let (.Number(l), .Number(r)):
         return l == r
-    case let (.Array(l), .Array(r)):
-        return l == r
-    case let (.Object(l), .Object(r)):
-        return l == r
-    case (.Null, .Null): return true
+    case (.Null, .Null):
+        return true
     default:
         return false
     }

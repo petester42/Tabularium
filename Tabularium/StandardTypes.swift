@@ -6,12 +6,12 @@ extension String: Archivable {
         return .String(value)
     }
     
-    public static func decompress(archive: Archive) throws -> String {
+    public static func decompress(archive: Archive) -> ArchiveResult<String> {
         switch archive {
         case .String(let string):
-            return string
+            return .Success(string)
         default:
-            throw ArchiverError.NoValueFound
+            return .typeMismatch("String", actual: archive)
         }
     }
 }
@@ -22,12 +22,12 @@ extension UInt: Archivable {
         return .Number(NSNumber(unsignedInteger: value))
     }
     
-    public static func decompress(archive: Archive) throws -> UInt {
+    public static func decompress(archive: Archive) -> ArchiveResult<UInt> {
         switch archive {
         case .Number(let number):
-            return number.unsignedIntegerValue
+            return .Success(number.unsignedIntegerValue)
         default:
-            throw ArchiverError.NoValueFound
+            return .typeMismatch("UInt", actual: archive)
         }
     }
 }
@@ -38,12 +38,12 @@ extension Int: Archivable {
         return .Number(NSNumber(integer: value))
     }
     
-    public static func decompress(archive: Archive) throws -> Int {
+    public static func decompress(archive: Archive) -> ArchiveResult<Int> {
         switch archive {
         case .Number(let number):
-            return number.integerValue
+            return .Success(number.integerValue)
         default:
-            throw ArchiverError.NoValueFound
+            return .typeMismatch("Int", actual: archive)
         }
     }
 }
@@ -54,12 +54,12 @@ extension UInt8: Archivable {
         return .Number(NSNumber(unsignedChar: value))
     }
     
-    public static func decompress(archive: Archive) throws -> UInt8 {
+    public static func decompress(archive: Archive) -> ArchiveResult<UInt8> {
         switch archive {
         case .Number(let number):
-            return number.unsignedCharValue
+            return .Success(number.unsignedCharValue)
         default:
-            throw ArchiverError.NoValueFound
+            return .typeMismatch("UInt8", actual: archive)
         }
     }
 }
@@ -70,12 +70,12 @@ extension Int8: Archivable {
         return .Number(NSNumber(char: value))
     }
     
-    public static func decompress(archive: Archive) throws -> Int8 {
+    public static func decompress(archive: Archive) -> ArchiveResult<Int8> {
         switch archive {
         case .Number(let number):
-            return number.charValue
+            return .Success(number.charValue)
         default:
-            throw ArchiverError.NoValueFound
+            return .typeMismatch("Int8", actual: archive)
         }
     }
 }
@@ -86,12 +86,12 @@ extension UInt16: Archivable {
         return .Number(NSNumber(unsignedShort: value))
     }
     
-    public static func decompress(archive: Archive) throws -> UInt16 {
+    public static func decompress(archive: Archive) -> ArchiveResult<UInt16> {
         switch archive {
         case .Number(let number):
-            return number.unsignedShortValue
+            return .Success(number.unsignedShortValue)
         default:
-            throw ArchiverError.NoValueFound
+            return .typeMismatch("UInt16", actual: archive)
         }
     }
 }
@@ -102,12 +102,12 @@ extension Int16: Archivable {
         return .Number(NSNumber(short: value))
     }
     
-    public static func decompress(archive: Archive) throws -> Int16 {
+    public static func decompress(archive: Archive) -> ArchiveResult<Int16> {
         switch archive {
         case .Number(let number):
-            return number.shortValue
+            return .Success(number.shortValue)
         default:
-            throw ArchiverError.NoValueFound
+            return .typeMismatch("Int16", actual: archive)
         }
     }
 }
@@ -118,12 +118,12 @@ extension UInt32: Archivable {
         return .Number(NSNumber(unsignedInt: value))
     }
     
-    public static func decompress(archive: Archive) throws -> UInt32 {
+    public static func decompress(archive: Archive) -> ArchiveResult<UInt32> {
         switch archive {
         case .Number(let number):
-            return number.unsignedIntValue
+            return .Success(number.unsignedIntValue)
         default:
-            throw ArchiverError.NoValueFound
+            return .typeMismatch("UInt32", actual: archive)
         }
     }
 }
@@ -134,12 +134,12 @@ extension Int32: Archivable {
         return .Number(NSNumber(int: value))
     }
     
-    public static func decompress(archive: Archive) throws -> Int32 {
+    public static func decompress(archive: Archive) -> ArchiveResult<Int32> {
         switch archive {
         case .Number(let number):
-            return number.intValue
+            return .Success(number.intValue)
         default:
-            throw ArchiverError.NoValueFound
+            return .typeMismatch("Int32", actual: archive)
         }
     }
 }
@@ -150,12 +150,12 @@ extension UInt64: Archivable {
         return .Number(NSNumber(unsignedLongLong: value))
     }
     
-    public static func decompress(archive: Archive) throws -> UInt64 {
+    public static func decompress(archive: Archive) -> ArchiveResult<UInt64> {
         switch archive {
         case .Number(let number):
-            return number.unsignedLongLongValue
+            return .Success(number.unsignedLongLongValue)
         default:
-            throw ArchiverError.NoValueFound
+            return .typeMismatch("UInt64", actual: archive)
         }
     }
 }
@@ -166,12 +166,12 @@ extension Int64: Archivable {
         return .Number(NSNumber(longLong: value))
     }
     
-    public static func decompress(archive: Archive) throws -> Int64 {
+    public static func decompress(archive: Archive) -> ArchiveResult<Int64> {
         switch archive {
         case .Number(let number):
-            return number.longLongValue
+            return .Success(number.longLongValue)
         default:
-            throw ArchiverError.NoValueFound
+            return .typeMismatch("Int64", actual: archive)
         }
     }
 }
@@ -182,12 +182,12 @@ extension Float: Archivable {
         return .Number(NSNumber(float: value))
     }
     
-    public static func decompress(archive: Archive) throws -> Float {
+    public static func decompress(archive: Archive) -> ArchiveResult<Float> {
         switch archive {
         case .Number(let number):
-            return number.floatValue
+            return .Success(number.floatValue)
         default:
-            throw ArchiverError.NoValueFound
+            return .typeMismatch("Float", actual: archive)
         }
     }
 }
@@ -198,12 +198,12 @@ extension Double: Archivable {
         return .Number(NSNumber(double: value))
     }
     
-    public static func decompress(archive: Archive) throws -> Double {
+    public static func decompress(archive: Archive) -> ArchiveResult<Double> {
         switch archive {
         case .Number(let number):
-            return number.doubleValue
+            return .Success(number.doubleValue)
         default:
-            throw ArchiverError.NoValueFound
+            return .typeMismatch("Double", actual: archive)
         }
     }
 }
@@ -214,12 +214,12 @@ extension Bool: Archivable {
         return .Number(NSNumber(bool: value))
     }
     
-    public static func decompress(archive: Archive) throws -> Bool {
+    public static func decompress(archive: Archive) -> ArchiveResult<Bool> {
         switch archive {
         case .Number(let number):
-            return number.boolValue
+            return .Success(number.boolValue)
         default:
-            throw ArchiverError.NoValueFound
+            return .typeMismatch("Bool", actual: archive)
         }
     }
 }
@@ -235,13 +235,8 @@ public extension Optional where Wrapped: Archivable, Wrapped == Wrapped.Archived
         }
     }
     
-    public static func decompress(archive: Archive) throws -> Wrapped? {
-        
-        do {
-            return try Wrapped.decompress(archive)
-        } catch {
-            throw ArchiverError.NoValueFound
-        }
+    public static func decompress(archive: Archive) -> ArchiveResult<Wrapped?> {
+        return .optional(Wrapped.decompress(archive))
     }
 }
 
@@ -251,12 +246,15 @@ public extension CollectionType where Generator.Element: Archivable, Generator.E
         return .Array(value.map(Generator.Element.compress))
     }
     
-    public static func decompress(archive: Archive) throws -> [Generator.Element] {
+    public static func decompress(archive: Archive) -> ArchiveResult<[Generator.Element]> {
         switch archive {
         case .Array(let array):
-            return try array.map(Generator.Element.decompress)
+            return array.reduce(ArchiveResult<[Generator.Element]>.Success([])) { acc, elem in
+                print(Generator.Element.decompress(elem))
+                return acc
+            }
         default:
-            throw ArchiverError.NoValueFound
+            return .typeMismatch("Array", actual: archive)
         }
     }
 }
@@ -267,12 +265,34 @@ public extension DictionaryLiteralConvertible where Value: Archivable, Value == 
         return .Object(value.map(Value.compress))
     }
     
-    public static func decompress(archive: Archive) throws -> [String : Value] {
+    public static func decompress(archive: Archive) -> ArchiveResult<[String : Value]> {
         switch archive {
         case .Object(let object):
-            return try object.map(Value.decompress)
+            return object.reduce(ArchiveResult<[String : Value]>.Success([:])) { acc, elem in
+                print( Value.decompress(elem.1))
+                return acc
+            }
         default:
-            throw ArchiverError.NoValueFound
+            return .typeMismatch("Object", actual: archive)
         }
+    }
+}
+
+public func decompressArchive(archive: Archive, forKey key: String) -> ArchiveResult<Archive> {
+    
+    switch archive {
+    case .Object(let object):
+        return guardNull(key, archive: object[key] ?? .Null)
+    default:
+        return .typeMismatch("Object", actual: archive)
+    }
+}
+
+private func guardNull(key: String, archive: Archive) -> ArchiveResult<Archive> {
+    switch archive {
+    case .Null:
+        return .missingKey(key)
+    default:
+        return .Success(archive)
     }
 }
